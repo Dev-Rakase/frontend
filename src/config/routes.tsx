@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import Login from "../pages/Login";
 import Dashboard from "../pages/Dashboard";
 import ErrorComponent from "../components/ErrorComponent";
+import ProtectedRouteContext from "../context/ProtectedRouteContext";
 
 export const routes = createBrowserRouter([
     {
@@ -12,7 +13,11 @@ export const routes = createBrowserRouter([
     },
     {
         path: "/dashboard",
-        element: <Dashboard />,
+        element: (
+            <ProtectedRouteContext>
+                <Dashboard />
+            </ProtectedRouteContext>
+        ),
         errorElement: <ErrorComponent />
     }
 ])

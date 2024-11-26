@@ -3,9 +3,13 @@ import { z } from "zod"
 import { loginUserSchema } from "../schema/user.schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { cn } from "../libs/utils"
-import { useTransition } from "react"
+import { useEffect, useTransition } from "react"
+import { createUserWithEmailAndPassword, getAuth, onAuthStateChanged } from "firebase/auth"
+import { auth } from "../libs/auth"
+import { useNavigate } from "react-router-dom"
 
 export default function Login() {
+    const navigate = useNavigate()
     const { handleSubmit, formState: { errors }, register } = useForm<z.infer<typeof loginUserSchema>>({
         resolver: zodResolver(loginUserSchema),
         defaultValues: {
@@ -15,14 +19,35 @@ export default function Login() {
     });
     const [loading, startTransition] = useTransition()
 
+
+    useEffect(() => {
+        const auth = getAuth();
+        const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
+            if (currentUser) {
+                navigate("/dashboard")
+            }
+        });
+
+        return () => unsubscribe();
+    }, [navigate]);
+
     const formSubmit = (data: z.infer<typeof loginUserSchema>) => {
+        // can move action to redux async thunk if login and app is big
         startTransition(() => {
+            createUserWithEmailAndPassword(auth, data.email, data.password).then(userCredential => {
+
+                // call backend api to save user info
+                console.log(userCredential)
+
+                navigate("/dashboard")
+
+            })
 
         })
     }
 
 
-
+    // can use better component like shadcn-UI for FORM & Button
     return (
         <div className="w-full h-screen flex flex-col gap-4 justify-center items-center ">
             <h4 className="text-xl font-bold">Login Form</h4>
