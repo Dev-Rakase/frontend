@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useState } from "react"
+import React, { createContext, useContext, useEffect, useState } from "react"
 import { auth } from "../libs/auth"
 import { getAuth, onAuthStateChanged, User } from "firebase/auth";
 import { Navigate } from "react-router-dom";
@@ -49,4 +49,14 @@ export default function ProtectedRouteContext({ children }: IAuthContextProvider
     return (
         <AuthContext.Provider value={{ user }}>{children}</AuthContext.Provider>
     )
+}
+
+
+export const useAuth = () => {
+    const context = useContext(AuthContext);
+
+    if (context == null) {
+        throw new Error("useUser must be used within ProtectedRouteContext")
+    }
+    return context.user;
 }
