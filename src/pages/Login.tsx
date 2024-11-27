@@ -4,9 +4,11 @@ import { loginUserSchema } from "../schema/user.schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { cn } from "../libs/utils"
 import { useEffect, useTransition } from "react"
-import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth"
+import { onAuthStateChanged, signInWithCustomToken } from "firebase/auth"
 import { auth } from "../libs/auth"
 import { Link, useNavigate } from "react-router-dom"
+import { toast } from "react-toastify"
+import API from "../libs/config"
 
 export default function Login() {
     const navigate = useNavigate()
@@ -35,9 +37,12 @@ export default function Login() {
         // can move action to redux async thunk if login and app is big
         startTransition(() => {
 
-            signInWithEmailAndPassword(auth, data.email, data.password).catch(err => {
-                //better with react-hot-toast, shadcn-toast
-                alert(err.message)
+            API.post("/auth/login", data).then(({ data }) => {
+                signInWithCustomToken(auth, data.token).then(() => {
+                    toast.success("Login Success")
+                })
+            }).catch(err => {
+                toast.error(err?.response?.data?.message)
             })
 
         })

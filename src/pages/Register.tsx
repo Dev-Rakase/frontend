@@ -4,9 +4,11 @@ import { registerUserSchema } from "../schema/user.schema"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { cn } from "../libs/utils"
 import { useEffect, useTransition } from "react"
-import { createUserWithEmailAndPassword, onAuthStateChanged } from "firebase/auth"
+import { onAuthStateChanged } from "firebase/auth"
 import { auth } from "../libs/auth"
 import { Link, useNavigate } from "react-router-dom"
+import API from "../libs/config"
+import { toast } from "react-toastify"
 
 export default function Register() {
     const navigate = useNavigate()
@@ -36,14 +38,10 @@ export default function Register() {
     const formSubmit = (data: z.infer<typeof registerUserSchema>) => {
         // can move action to redux async thunk if login and app is big
         startTransition(() => {
-            createUserWithEmailAndPassword(auth, data.email, data.password).then(userCredential => {
-
-                // call backend api to save user info
-                console.log(userCredential)
-
-
+            API.post("/auth/register", data).then(() => {
+                toast.success("Account Created Successfully, you can login now")
             }).catch(err => {
-                alert(err.message)
+                toast.error(err?.response?.data?.message)
             })
 
         })
