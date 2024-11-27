@@ -2,4 +2,6 @@
 
 ## Code test frontend
 
-- build docker image via `docker build -t  frontend .`
+- create .env file from .env.example
+- enter firebase & backend endpoint in .env file
+- build & start docker container via `docker-compose up -d --build`
